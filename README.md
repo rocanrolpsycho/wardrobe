@@ -11,6 +11,11 @@ Your clothes, extracted and organized with gpt-image.
 
 </div>
 
+> **This is a fork of [tandpfun/wardrobe](https://github.com/tandpfun/wardrobe)** by [@tandpfun](https://github.com/tandpfun), with extra improvements on top. All credit for the original project goes to its author.
+>
+> **Changes in this fork:**
+> - Selectable image quality (low / medium / high) when importing and regenerating, to control API cost.
+
 ![Wardrobe gallery](docs/screenshots/gallery.png)
 
 ![Modeled wardrobe editor](docs/screenshots/editor.png)
