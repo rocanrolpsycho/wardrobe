@@ -419,6 +419,7 @@ export function wardrobeImportApi(options = {}) {
       thumbnail: `${LIBRARY_ASSET_ROOT}/${garmentName}`,
       modeledImage: modeledImage || existing?.modeledImage || null,
       importJobId: job.id,
+      addedAt: existing?.addedAt || new Date().toISOString(),
     };
     const next = [...records.filter((item) => item.id !== id), record];
     await atomicJson(importedFile, next);
