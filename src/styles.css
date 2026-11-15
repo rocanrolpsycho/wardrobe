@@ -912,3 +912,136 @@ button { font: inherit; }
     box-shadow: inset 3px 0 0 var(--accent), -18px 0 50px rgba(25, 24, 22, .08);
   }
 }
+
+/* Wear history, rediscover and laundry (fork addition) */
+.view-nav { display: flex; gap: 0; flex-wrap: wrap; }
+.view-nav button {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 520;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.view-nav button + button { border-left: 0; }
+.view-nav button.active { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.view-nav button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+
+.view-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+  padding: 34px 56px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.view-toolbar p { margin: 0; }
+.view-toolbar label { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; }
+.view-toolbar select {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+}
+.view-subheading {
+  margin: 34px 56px 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.gallery-item { position: relative; }
+.gallery-item.is-away img { opacity: .38; }
+.gallery-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 7px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 9px;
+  font-weight: 560;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.gallery-item.has-caption { padding-bottom: 34px; }
+.gallery-caption {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.usage-panel {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 24px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 22px;
+}
+.usage-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.usage-summary p { margin: 0; font-size: 13px; }
+.usage-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.usage-log-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.usage-log-row input {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, .18);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.usage-check { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.usage-history { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.usage-history li { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); padding: 3px 4px 3px 8px; font-size: 11px; }
+.usage-history li:has(.usage-more) { border: 0; padding: 0; }
+.usage-history button { display: inline-grid; place-items: center; border: 0; padding: 2px; background: transparent; color: var(--muted); cursor: pointer; }
+.usage-history button:hover, .usage-history button:focus-visible { color: var(--accent); outline: none; }
+.usage-history .usage-more { font-size: 11px; text-decoration: underline; }
+.usage-status { display: flex; flex-wrap: wrap; }
+.usage-status button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  padding: 6px 11px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.usage-status button + button { border-left: 0; }
+.usage-status button.active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.usage-status button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+
+@media (max-width: 860px) {
+  .gallery-meta-row { flex-wrap: wrap; gap: 14px; }
+  .view-toolbar { padding: 26px 24px 0; }
+  .view-subheading { margin-inline: 24px; }
+}
+@media (max-width: 520px) {
+  .view-toolbar { padding: 20px 18px 0; }
+  .view-subheading { margin-inline: 18px; }
+}

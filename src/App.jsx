@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Trash, X } from "@phosphor-icons/react";
 import { WardrobeImportFlow } from "./import-flow.jsx";
 import { OptimizedImage } from "./OptimizedImage.jsx";
+import { STATUS_LABELS, UsagePanel, idleLabel, rediscoverList, useUsage } from "./usage.jsx";
 
 const STORAGE_KEY = "open-wardrobe-edits-v1";
 const DELETED_STORAGE_KEY = "open-wardrobe-deleted-v1";
@@ -153,12 +154,13 @@ function sampleImageColor(image, canvas, event) {
   return null;
 }
 
-function GalleryItem({ item, selected, onOpen }) {
+function GalleryItem({ item, selected, onOpen, status = "available", caption }) {
   const type = TYPE_MAP[item.part]?.singular || "wardrobe item";
+  const away = status !== "available";
 
   return (
     <button
-      className={`gallery-item${selected ? " selected" : ""}`}
+      className={`gallery-item${selected ? " selected" : ""}${away ? " is-away" : ""}${caption ? " has-caption" : ""}`}
       type="button"
       onClick={() => onOpen(item.id)}
       aria-label={`View ${item.name || type}`}
@@ -171,6 +173,8 @@ function GalleryItem({ item, selected, onOpen }) {
         sizes="(max-width: 520px) calc(50vw - 16px), (max-width: 860px) calc(33vw - 18px), 180px"
         breakpoints={[120, 180, 240, 320, 480]}
       />
+      {away && <span className="gallery-badge">{status === "laundry" ? "Laundry" : "Unavailable"}</span>}
+      {caption && <span className="gallery-caption">{caption}</span>}
     </button>
   );
 }
@@ -335,7 +339,7 @@ function ItemEditor({ draft, setDraft, palette, sampling, setSampling, sampleSta
   );
 }
 
-function ItemViewer({ item, onClose, onSave, onDelete }) {
+function ItemViewer({ item, onClose, onSave, onDelete, usage, onLogWear, onRemoveWear, onSetStatus }) {
   const closeButtonRef = useRef(null);
   const imageRef = useRef(null);
   const samplingCanvasRef = useRef(null);
@@ -504,6 +508,8 @@ function ItemViewer({ item, onClose, onSave, onDelete }) {
       )}
 
       <div className="viewer-details editing">
+        <UsagePanel item={item} usage={usage} onLogWear={onLogWear} onRemoveWear={onRemoveWear} onSetStatus={onSetStatus} />
+
         <ItemEditor
           draft={draft}
           setDraft={setDraft}
@@ -538,6 +544,10 @@ export function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [view, setView] = useState("wardrobe");
+  const [idleDays, setIdleDays] = useState(30);
+  const { usage, error: usageError, logWear, removeWear, setStatus, finishLaundry } = useUsage();
+  const statusOf = (id) => usage[id]?.status || "available";
 
   useEffect(() => {
     fetch("/api/import/wardrobe", { cache: "no-store" })
@@ -567,6 +577,29 @@ export function App() {
       return a.id.localeCompare(b.id);
     });
   }, [activeType, items]);
+
+  const rediscover = useMemo(() => rediscoverList(visibleItems, usage, idleDays), [visibleItems, usage, idleDays]);
+  const laundryItems = useMemo(() => visibleItems.filter((item) => statusOf(item.id) === "laundry"), [visibleItems, usage]);
+  const unavailableItems = useMemo(() => visibleItems.filter((item) => statusOf(item.id) === "unavailable"), [visibleItems, usage]);
+  const laundryCount = items.filter((item) => statusOf(item.id) === "laundry").length;
+
+  const renderGrid = (list, label, captionFor) => (
+    <section className="gallery-grid" aria-label={label}>
+      {list.map((entry) => {
+        const item = entry.item || entry;
+        return (
+          <GalleryItem
+            key={item.id}
+            item={item}
+            selected={selectedId === item.id}
+            onOpen={setSelectedId}
+            status={view === "wardrobe" ? statusOf(item.id) : "available"}
+            caption={captionFor?.(entry)}
+          />
+        );
+      })}
+    </section>
+  );
 
   const chooseType = (typeId) => {
     setActiveType(typeId);
@@ -609,6 +642,13 @@ export function App() {
         <header className="gallery-header">
           <div className="gallery-meta-row">
             <p className="piece-count">{items.length} {items.length === 1 ? "piece" : "pieces"}</p>
+            {!!items.length && (
+              <nav className="view-nav" aria-label="Wardrobe views">
+                {[["wardrobe", "Wardrobe"], ["rediscover", "Rediscover"], ["laundry", laundryCount ? `Laundry (${laundryCount})` : "Laundry"]].map(([id, label]) => (
+                  <button key={id} type="button" className={view === id ? "active" : ""} aria-pressed={view === id} onClick={() => { setView(id); setSelectedId(null); }}>{label}</button>
+                ))}
+              </nav>
+            )}
           </div>
           <nav className="category-nav" aria-label="Filter wardrobe by item type">
             {TYPES.map((type) => (
@@ -626,24 +666,47 @@ export function App() {
         </header>
 
         {error && <p className="status error">{error}</p>}
+        {usageError && <p className="status error">{usageError}</p>}
         {!error && loading && <p className="status">Loading wardrobe</p>}
         {!error && !loading && !items.length && <p className="status empty">Drop, paste, or add a photo to import your first piece.</p>}
 
-        {!!items.length && (
-          <section className="gallery-grid" aria-label={`${TYPE_MAP[activeType]?.label || "All"} wardrobe items`}>
-            {visibleItems.map((item) => (
-              <GalleryItem
-                key={item.id}
-                item={item}
-                selected={selectedId === item.id}
-                onOpen={setSelectedId}
-              />
-            ))}
-          </section>
+        {!!items.length && view === "wardrobe" && renderGrid(visibleItems, `${TYPE_MAP[activeType]?.label || "All"} wardrobe items`)}
+
+        {!!items.length && view === "rediscover" && (
+          <>
+            <div className="view-toolbar">
+              <p>Pieces you haven't worn in a while. Give them another chance.</p>
+              <label>
+                Not worn for
+                <select value={idleDays} onChange={(event) => setIdleDays(Number(event.target.value))}>
+                  {[14, 30, 60, 90, 180].map((days) => <option key={days} value={days}>{days} days or more</option>)}
+                </select>
+              </label>
+            </div>
+            {rediscover.length
+              ? renderGrid(rediscover, "Pieces to rediscover", idleLabel)
+              : <p className="status empty">Nothing forgotten here. Everything has been worn recently.</p>}
+          </>
+        )}
+
+        {!!items.length && view === "laundry" && (
+          <>
+            <div className="view-toolbar">
+              <p>{laundryItems.length ? `${laundryItems.length} ${laundryItems.length === 1 ? "piece is" : "pieces are"} in the laundry.` : "The laundry basket is empty."}</p>
+              {!!laundryItems.length && <button className="primary-button" type="button" onClick={finishLaundry}><Check size={15} weight="bold" aria-hidden="true" /> Laundry done, all clean</button>}
+            </div>
+            {!!laundryItems.length && renderGrid(laundryItems, "Pieces in the laundry")}
+            {!!unavailableItems.length && (
+              <>
+                <h2 className="view-subheading">{STATUS_LABELS.unavailable}</h2>
+                {renderGrid(unavailableItems, "Unavailable pieces")}
+              </>
+            )}
+          </>
         )}
       </main>
 
-      {selectedItem && <ItemViewer item={selectedItem} onClose={() => setSelectedId(null)} onSave={saveItem} onDelete={deleteItem} />}
+      {selectedItem && <ItemViewer item={selectedItem} onClose={() => setSelectedId(null)} onSave={saveItem} onDelete={deleteItem} usage={usage[selectedItem.id]} onLogWear={logWear} onRemoveWear={removeWear} onSetStatus={setStatus} />}
       <WardrobeImportFlow onGarmentApproved={addImportedItem} onModeledApproved={attachImportedModeledImage} />
     </div>
   );
