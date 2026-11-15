@@ -15,6 +15,7 @@ Marca `[x]` cuando una idea quede hecha en este fork.
 ## Hecho
 
 - [x] Calidad de imagen seleccionable (baja / media / alta) al importar y regenerar, baja por defecto
+- [x] Registro de uso con historial, vista "Rediscover" y lavandería (rama `uso-y-lavanderia`)
 
 ---
 
@@ -44,9 +45,9 @@ Marca `[x]` cuando una idea quede hecha en este fork.
 
 ## 3. Uso y cuidado de la ropa
 
-- [ ] Registrar cuándo usas cada prenda, con historial ([eyeb0l](https://github.com/eyeb0l/wardrobe), [hhwjsw711](https://github.com/hhwjsw711/wardrobe))
-- [ ] "Redescubrir": prendas que llevas mucho sin usar ([eyeb0l](https://github.com/eyeb0l/wardrobe))
-- [ ] Lavandería: marcar qué está sucio o no disponible ([eyeb0l](https://github.com/eyeb0l/wardrobe))
+- [x] Registrar cuándo usas cada prenda, con historial ([eyeb0l](https://github.com/eyeb0l/wardrobe), [hhwjsw711](https://github.com/hhwjsw711/wardrobe))
+- [x] "Redescubrir": prendas que llevas mucho sin usar ([eyeb0l](https://github.com/eyeb0l/wardrobe))
+- [x] Lavandería: marcar qué está sucio o no disponible ([eyeb0l](https://github.com/eyeb0l/wardrobe))
 - [ ] Etiqueta de cuidado, escrita o escaneada con foto ([eyeb0l](https://github.com/eyeb0l/wardrobe), [LeafarCoder](https://github.com/LeafarCoder/wardrobe))
 
 ## 4. Compras

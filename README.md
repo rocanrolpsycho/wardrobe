@@ -15,6 +15,7 @@ Your clothes, extracted and organized with gpt-image.
 >
 > **Changes in this fork:**
 > - Selectable image quality (low / medium / high) when importing and regenerating, to control API cost.
+> - Wear log with history, a "Rediscover" view for pieces you haven't worn in a while, and laundry / availability tracking. Ideas inspired by [eyeb0l/wardrobe](https://github.com/eyeb0l/wardrobe) and [hhwjsw711/wardrobe](https://github.com/hhwjsw711/wardrobe); implemented from scratch.
 
 ![Wardrobe gallery](docs/screenshots/gallery.png)
 
