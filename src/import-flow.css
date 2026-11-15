@@ -318,3 +318,7 @@
   .import-status.is-processing::before,
   .import-spinner { animation: none !important; }
 }
+
+.import-quality-field { margin-bottom: 18px; }
+.import-quality-field select { max-width: 220px; }
+.import-quality-hint { color: var(--import-muted); font-size: 11px; }
